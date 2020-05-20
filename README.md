@@ -18,12 +18,11 @@ Want to get paid for your contributions to `jest-image-snapshot`?
 * [Features](#-features)
 * [Usage](#-usage)
 * [API](#-api)
-* [Available Scripts](#-available-scripts)
 * [Contributing](#-contributing)
 
 ## ✨ Features
 
-* Take image snapshots of your React components
+* Take image snapshots of your application
 * Ability to compare snapshots from a baseline
 * Update snapshots when you're good with changes
 * Customize a difference threshold
@@ -76,7 +75,7 @@ Thanks `jest-image-snapshot`, that broken header would not have looked good in p
 npm i --save-dev jest-image-snapshot
 ```
 
-Please note that `Jest` `>=20 <=24` is a peerDependency. `jest-image-snapshot` will **not** work with anything below Jest 20.x.x
+Please note that `Jest` `>=20 <=25` is a peerDependency. `jest-image-snapshot` will **not** work with anything below Jest 20.x.x
 
 ### Invocation
 
@@ -112,9 +111,10 @@ See [the examples](./examples/README.md) for more detailed usage or read about a
 * `failureThreshold`: (default `0`) Sets the threshold that would trigger a test failure based on the `failureThresholdType` selected. This is different to the `customDiffConfig.threshold` above, that is the per pixel failure threshold, this is the failure threshold for the entire comparison.
 * `failureThresholdType`: (default `pixel`) (options `percent` or `pixel`) Sets the type of threshold that would trigger a failure.
 * `updatePassedSnapshot`: (default `false`) Updates a snapshot even if it passed the threshold against the existing one.
-* `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting it's value to 1-2 should be enough to solve that problem.
+* `blur`: (default `0`) Applies Gaussian Blur on compared images, accepts radius in pixels as value. Useful when you have noise after scaling images per different resolutions on your target website, usually setting its value to 1-2 should be enough to solve that problem.
 * `runInProcess`: (default `false`) Runs the diff in process without spawning a child process.
 * `dumpDiffToConsole`: (default `false`) Will output base64 string of a diff image to console in case of failed tests (in addition to creating a diff image). This string can be copy-pasted to a browser address string to preview the diff for a failed test.
+* `allowSizeMismatch`: (default `false`) If set to true, the build will not fail when the screenshots to compare have different sizes.
 
 ```javascript
 it('should demonstrate this matcher`s usage with a custom pixelmatch config', () => {
@@ -209,20 +209,6 @@ it('renders correctly', async () => {
 ...
 ```
 
-## 📜 Available Scripts
-
-**`npm run lint`**
-
-Verifies that your code matches the American Express code style defined in [`eslint-config-amex`](https://github.com/americanexpress/eslint-config-amex).
-
-**`npm test`**
-
-Runs unit tests **and** verifies the format of all commit messages on the current branch.
-
-**`npm posttest`**
-
-Runs linting on the current branch.
-
 ## 🏆 Contributing
 
 We welcome Your interest in the American Express Open Source Community on Github.
@@ -233,7 +219,7 @@ and to recipients of software distributed by American Express, You reserve all
 right, title, and interest, if any, in and to Your Contributions. Please [fill
 out the Agreement](https://cla-assistant.io/americanexpress/jest-image-snapshot).
 
-Please feel free to open pull requests and see [CONTRIBUTING.md](./CONTRIBUTING.md) for commit formatting details.
+Please feel free to open pull requests and see [CONTRIBUTING.md](./CONTRIBUTING.md) to learn how to get started contributing.
 
 ## 🗝️ License
 

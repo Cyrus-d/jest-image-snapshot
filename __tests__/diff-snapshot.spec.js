@@ -138,8 +138,6 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
-      // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
     });
 
     it('it should not write a diff if a test passes', () => {
@@ -160,8 +158,6 @@ describe('diff-snapshot', () => {
         diffPixelCount: 0,
         pass: true,
       });
-      // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
 
       // Check that that it did not attempt to write a diff
       expect(mockWriteFileSync.mock.calls).toEqual([]);
@@ -186,7 +182,7 @@ describe('diff-snapshot', () => {
         pass: false,
       });
 
-      const isBase64ImgStr = result.imgSrcString.includes('data:image') && result.imgSrcString.includes('base64');
+      const isBase64ImgStr = result.imgSrcString.includes('data:image/png;base64,iV');
       expect(isBase64ImgStr).toBe(true);
 
       expect(mockPixelMatch).toHaveBeenCalledTimes(1);
@@ -246,6 +242,44 @@ describe('diff-snapshot', () => {
       expect(result.pass).toBe(true);
       expect(result.diffPixelCount).toBe(250);
       expect(result.diffRatio).toBe(0.025);
+    });
+
+    it('should pass with allowSizeMismatch: true if image passed is a different size but <= failureThreshold pixel', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockBigImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 250,
+        failureThresholdType: 'pixel',
+        allowSizeMismatch: true,
+      });
+
+      expect(result.pass).toBe(true);
+      expect(result.diffSize).toBe(true);
+      expect(result.diffPixelCount).toBe(250);
+      expect(result.diffRatio).toBe(0.1 / 9);
+    });
+
+    it('should fail with allowSizeMismatch: true if image passed is a different size but > failureThreshold pixel', () => {
+      const diffImageToSnapshot = setupTest({ snapshotExists: true, pixelmatchResult: 250 });
+      const result = diffImageToSnapshot({
+        receivedImageBuffer: mockBigImageBuffer,
+        snapshotIdentifier: mockSnapshotIdentifier,
+        snapshotsDir: mockSnapshotsDir,
+        diffDir: mockDiffDir,
+        updateSnapshot: false,
+        failureThreshold: 0,
+        failureThresholdType: 'pixel',
+        allowSizeMismatch: true,
+      });
+
+      expect(result.pass).toBe(false);
+      expect(result.diffSize).toBe(true);
+      expect(result.diffPixelCount).toBe(250);
+      expect(result.diffRatio).toBe(0.1 / 9);
     });
 
     it('should pass = image checksums', () => {
@@ -348,7 +382,14 @@ describe('diff-snapshot', () => {
       });
 
       // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Number), // image width
+        expect.any(Number), // image height
+        { threshold: 0.01 }
+      );
     });
 
     it('should merge custom configuration with default configuration if custom config is passed', () => {
@@ -361,7 +402,6 @@ describe('diff-snapshot', () => {
         diffDir: mockDiffDir,
         updateSnapshot: false,
         customDiffConfig: {
-          threshold: 0.1,
           foo: 'bar',
         },
         failureThreshold: 0,
@@ -369,7 +409,14 @@ describe('diff-snapshot', () => {
       });
 
       // Check that pixelmatch was not called
-      expect(mockPixelMatch).not.toHaveBeenCalled();
+      expect(mockPixelMatch).toHaveBeenCalledWith(
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Object), // buffer data
+        expect.any(Number), // image width
+        expect.any(Number), // image height
+        { foo: 'bar', threshold: 0.01 }
+      );
     });
 
     it('should create diff output directory if there is not one already and test is failing', () => {

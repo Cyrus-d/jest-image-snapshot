@@ -168,7 +168,7 @@ describe('toMatchImageSnapshot', () => {
     const biggerImageData = fs.readFileSync(fromStubs('TestImage150x150.png'));
 
     it('fails for a different snapshot', () => {
-      const expectedError = /^Expected image to match or be a close match to snapshot but was 86\.55000000000001% different from snapshot \(8655 differing pixels\)\./;
+      const expectedError = /^Expected image to match or be a close match to snapshot but was 86\.45% different from snapshot \(8645 differing pixels\)\./;
       const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
 
       // Write a new snapshot image
@@ -305,6 +305,21 @@ describe('toMatchImageSnapshot', () => {
       ).not.toThrowError();
 
       expect(diffExists(customSnapshotIdentifier)).toBe(false);
+    });
+
+    it('handles diffs for large images', () => {
+      const largeImageData = fs.readFileSync(fromStubs('LargeTestImage.png'));
+      const largeFailureImageData = fs.readFileSync(fromStubs('LargeTestImageFailure.png'));
+      const customSnapshotIdentifier = getIdentifierIndicatingCleanupIsRequired();
+      // First we need to write a new snapshot image
+      expect(
+        () => expect(largeImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).not.toThrowError();
+
+      // then test against a different image
+      expect(
+        () => expect(largeFailureImageData).toMatchImageSnapshot({ customSnapshotIdentifier })
+      ).toThrow(/Expected image to match or be a close match/);
     });
   });
 });
